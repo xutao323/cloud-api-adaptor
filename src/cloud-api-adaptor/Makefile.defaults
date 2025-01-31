@@ -12,6 +12,34 @@ YQ_CHECKSUM_arm64 := "sha256:1d830254fe5cc2fb046479e6c781032976f5cf88f9d01a63858
 # none,az-cvm-vtpm,tdx,se,cca
 TEE_PLATFORM ?= none
 
+# Normalise ARCH constraints and avoid pre-defined global variables in:
+# https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
+ARCH ?= $(shell uname -m)
+ifneq "$(filter $(ARCH),x86_64 amd64)" ""
+	ARCH := x86_64
+	GO_ARCH := amd64
+	PROTOC_ARCH := x86_64
+else ifneq "$(filter $(ARCH),aarch64 arm64)" ""
+	ARCH := aarch64
+	GO_ARCH := arm64
+	PROTOC_ARCH := aarch_64
+else ifneq "$(filter $(ARCH),s390x)" ""
+	ARCH := s390x
+	GO_ARCH := s390x
+	PROTOC_ARCH := s390_64
+else ifneq "$(filter $(ARCH),ppc64le)" ""
+	ARCH := ppc64le
+	GO_ARCH := ppc64le
+	PROTOC_ARCH := ppc64le_64
+endif
+
+ifndef GO_ARCH
+$(error GO_ARCH is not set)
+endif
+ifndef PROTOC_ARCH
+$(error PROTOC_ARCH is not set)
+endif
+
 VERSIONS_HASH := $(firstword $(shell sha256sum $(VERSIONS_SRC)))
 
 define query
