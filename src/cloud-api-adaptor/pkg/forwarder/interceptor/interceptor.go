@@ -12,10 +12,10 @@ import (
 	"strings"
 	"time"
 
-	retry "github.com/avast/retry-go/v4"
+	"github.com/avast/retry-go/v4"
 	pb "github.com/kata-containers/kata-containers/src/runtime/virtcontainers/pkg/agent/protocols/grpc"
 	"github.com/moby/sys/mountinfo"
-	specs "github.com/opencontainers/runtime-spec/specs-go"
+	"github.com/opencontainers/runtime-spec/specs-go"
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/confidential-containers/cloud-api-adaptor/src/cloud-api-adaptor/pkg/util/agentproto"

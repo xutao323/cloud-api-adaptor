@@ -77,7 +77,6 @@ type Config struct {
 	VpcID                    string
 	InstanceProfiles         instanceProfiles
 	InstanceProfileSpecList  []provider.InstanceTypeSpec
-	DisableCVM               bool
 }
 
 func (c Config) Redact() Config {

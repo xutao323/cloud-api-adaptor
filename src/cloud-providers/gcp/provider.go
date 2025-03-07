@@ -137,7 +137,6 @@ func (p *gcpProvider) CreateInstance(ctx context.Context, podName, sandboxID str
 			MachineType: proto.String(fmt.Sprintf("zones/%s/machineTypes/%s", p.serviceConfig.Zone, p.serviceConfig.MachineType)),
 			NetworkInterfaces: []*computepb.NetworkInterface{
 				{
-					Network: proto.String(p.serviceConfig.Network),
 					AccessConfigs: []*computepb.AccessConfig{
 						{
 							Name:        proto.String("External NAT"),
@@ -145,6 +144,7 @@ func (p *gcpProvider) CreateInstance(ctx context.Context, podName, sandboxID str
 						},
 					},
 					StackType: proto.String("IPV4_Only"),
+					Name:      proto.String(p.serviceConfig.Network),
 				},
 			},
 		},

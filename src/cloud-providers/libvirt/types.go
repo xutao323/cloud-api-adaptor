@@ -65,6 +65,7 @@ type LaunchSecurityType int
 
 const (
 	NoLaunchSecurity LaunchSecurityType = iota
+	SEV
 	S390PV
 )
 
@@ -72,6 +73,8 @@ func (l LaunchSecurityType) String() string {
 	switch l {
 	case NoLaunchSecurity:
 		return "None"
+	case SEV:
+		return "SEV"
 	case S390PV:
 		return "S390PV"
 	default:

@@ -73,16 +73,6 @@ variable "cloud_provider" {
   default = env("CLOUD_PROVIDER")
 }
 
-variable "activation_key" {
-  type    = string
-  default = env("ACTIVATION_KEY")
-}
-
-variable "org_id" {
-  type    = string
-  default = env("ORG_ID")
-}
-
 variable "machine_type" {
   type    = string
   default = "pc"

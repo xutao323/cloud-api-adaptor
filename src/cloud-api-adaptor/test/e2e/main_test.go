@@ -163,7 +163,8 @@ func TestMain(m *testing.M) {
 			if kbsEndpoint, err = keyBrokerService.GetKbsEndpoint(ctx, cfg); err != nil {
 				return ctx, err
 			}
-			log.Infof("Https kbsEndpoint is: %s", kbsEndpoint)
+
+			log.Infof("kbsEndpoint: %s", kbsEndpoint)
 		}
 
 		if podvmImage != "" {
