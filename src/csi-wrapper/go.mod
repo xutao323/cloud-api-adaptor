@@ -1,6 +1,6 @@
 module github.com/confidential-containers/cloud-api-adaptor/src/csi-wrapper
 
-go 1.22.0
+go 1.23.0
 
 require (
 	github.com/confidential-containers/cloud-api-adaptor/src/cloud-api-adaptor v0.12.0
@@ -9,7 +9,7 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang/glog v1.2.4
 	github.com/golang/protobuf v1.5.4
-	github.com/kata-containers/kata-containers/src/runtime v0.0.0-20250116150548-2777b13db748
+	github.com/kata-containers/kata-containers/src/runtime v0.0.0-20250220145350-19a7f2773679
 	golang.org/x/net v0.33.0
 	google.golang.org/grpc v1.61.2
 	k8s.io/apimachinery v0.26.2
@@ -18,8 +18,6 @@ require (
 )
 
 require (
-	github.com/Masterminds/goutils v1.1.1 // indirect
-	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emicklei/go-restful/v3 v3.11.0 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
@@ -27,12 +25,10 @@ require (
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
 	github.com/go-openapi/jsonreference v0.20.2 // indirect
 	github.com/go-openapi/swag v0.22.4 // indirect
-	github.com/go-task/slim-sprig v2.20.0+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
-	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -47,9 +43,9 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/oauth2 v0.17.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
-	golang.org/x/term v0.27.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/term v0.29.0 // indirect
+	golang.org/x/text v0.22.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 	google.golang.org/appengine v1.6.8 // indirect

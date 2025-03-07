@@ -50,7 +50,7 @@ If you are using an existing cluster, you can skip this section and proceed to [
 1. Create a ROKS cluster
 
     ```bash
-    ibmcloud ks cluster create vpc-gen2 --flavor bx2.4x16 --name "$CLUSTER_NAME" --subnet-id "$SUBNET_ID" --vpc-id "$VPC_ID" --zone "$ZONE" --operating-system RHCOS --workers 2 --version 4.16.23_openshift --disable-outbound-traffic-protection --cos-instance "$COS_CRN"
+    ibmcloud ks cluster create vpc-gen2 --flavor bx2.4x16 --name "$CLUSTER_NAME" --subnet-id "$SUBNET_ID" --vpc-id "$VPC_ID" --zone "$ZONE" --operating-system RHCOS --workers 2 --version 4.17.14_openshift --disable-outbound-traffic-protection --cos-instance "$COS_CRN"
 
     ```
 
@@ -80,7 +80,7 @@ By default, your Red Hat OpenShift cluster will not work with the peer pod compo
 1. Allow `cloud-api-adaptor` to update pod finalizers
 
     ```bash
-    kubectl apply -n default -f - <<EOF
+    oc apply -n default -f - <<EOF
     apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:
@@ -111,7 +111,7 @@ By default, your Red Hat OpenShift cluster will not work with the peer pod compo
 1. Label worker nodes for `cloud-api-adaptor`
 
     ```bash
-    kubectl label nodes $(kubectl get nodes -o jsonpath={.items..metadata.name}) node.kubernetes.io/worker=
+    oc label nodes $(oc get nodes -o jsonpath={.items..metadata.name}) node.kubernetes.io/worker=
     ```
 
 1. Give `cc-operator` and `cloud-api-adaptor` priviledged OpenShift SCC permission
@@ -188,10 +188,20 @@ REGION="$(ibmcloud is zone $ZONE -json | jq -r .region.name)"
 IBMCLOUD_PROVIDER="ibmcloud"
 INSTANCE_PROFILE_NAME="bx2-2x8"
 CAA_IMAGE_TAG="latest-amd64"
+DISABLECVM="true"
 EOF
 ```
 
 This will create a `peerpods-cluster.properties` files in your home directory.
+
+You can optionally run peer pods in confidential (TDX enabled) VMs by changing the `DISABLECVM` property to `false`, but make sure you also change the `INSTANCE_PROFILE_NAME` property to a profile that supports the TDX confidential computing mode. For example:
+
+```bash
+sed -i ".bak" -e 's/DISABLECVM="true"/DISABLECVM="false"/' -e 's/bx2-2x8/bx3dc-2x10/' ~/peerpods-cluster.properties
+```
+
+> [!WARNING]
+> Confidential (CVM) mode is still a work in progress and should only be enabled for development purposes at this time.
 
 Finally, run the `caa-provisioner-cli` command to install the operator and cloud-api-adaptor:
 
@@ -207,7 +217,7 @@ popd
 Run the following command to confirm that the operator and cloud-api-adaptor have been deployed:
 
 ```bash
-kubectl get pods -n confidential-containers-system
+oc get pods -n confidential-containers-system
 ```
 
 Once everything is up and ruuning, you should see output similar to the following:
@@ -228,8 +238,8 @@ peerpod-ctrl-controller-manager-65f76cb59-vhbt4   2/2     Running   0          5
 You can run the following commands to validate that your cluster has been set up properly and is working as expected.
 
 ```bash
-kubectl apply -n default -f https://raw.githubusercontent.com/istio/istio/release-1.24/samples/curl/curl.yaml
-kubectl apply -n default -f - <<EOF
+oc apply -n default -f https://raw.githubusercontent.com/istio/istio/release-1.24/samples/curl/curl.yaml
+oc apply -n default -f - <<EOF
 apiVersion: v1
 kind: Pod
 metadata:
@@ -250,8 +260,8 @@ EOF
 Run the following commands to verify that the pods, peer pod, and pod VM are up and running:
 
 ```bash
-kubectl get pods -n default
-kubectl get peerpod -n default
+oc get pods -n default
+oc get peerpod -n default
 ibmcloud is instances | grep podvm
 ```
 
@@ -263,9 +273,9 @@ Finally, run the following command to verify that the helloworld service, runnin
 from the curl pod:
 
 ```bash
-export CURL_POD=$(kubectl get pod -n default -l app=curl -o jsonpath={.items..metadata.name})
-export HELLO_IP=$(kubectl get pod -n default -l app=helloworld -o jsonpath={.items..status.podIP})
-kubectl exec -n default -it $CURL_POD -c curl -- curl http://$HELLO_IP:5000/hello
+export CURL_POD=$(oc get pod -n default -l app=curl -o jsonpath={.items..metadata.name})
+export HELLO_IP=$(oc get pod -n default -l app=helloworld -o jsonpath={.items..status.podIP})
+oc exec -n default -it $CURL_POD -c curl -- curl http://$HELLO_IP:5000/hello
 ```
 
 If everything is working, you will see the following output:
@@ -276,22 +286,27 @@ Hello version: v1, instance: helloworld
 
 ## Uninstall and clean up
 
-If you want to cleanup the whole demo, including the cluster, simply delete the IBM Cloud cluster. Otherwise:
+If you want to cleanup the whole demo, including the cluster, simply delete the IBM Cloud cluster. 
+
+> [!NOTE]
+> Deleting the cluster might persist the podvm created by cloud-api-adaptor. Make sure to delete the Helloworld pod first.
+
+Otherwise:
 
 1. To delete the Helloworld sample
 
     ```bash
-    kubectl delete -n default -f https://raw.githubusercontent.com/istio/istio/release-1.24/samples/curl/curl.yaml
-    kubectl delete -n default pod helloworld
+    oc delete -n default -f https://raw.githubusercontent.com/istio/istio/release-1.24/samples/curl/curl.yaml
+    oc delete -n default pod helloworld
     ```
 
-1. To uninstall the peer pod components
+1. To uninstall the peer pod components 
 
     ```bash
     pushd test/tools
     export CLOUD_PROVIDER=ibmcloud
     export TEST_PROVISION_FILE="$HOME/peerpods-cluster.properties"
     ./caa-provisioner-cli -action=uninstall
-    kubectl delete ns confidential-containers-system
+    oc delete ns confidential-containers-system
     popd
     ```

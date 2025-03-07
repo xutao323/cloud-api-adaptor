@@ -13,7 +13,7 @@ import (
 
 	"github.com/IBM-Cloud/power-go-client/power/models"
 	"github.com/IBM/go-sdk-core/v5/core"
-	"github.com/avast/retry-go/v4"
+	retry "github.com/avast/retry-go/v4"
 	provider "github.com/confidential-containers/cloud-api-adaptor/src/cloud-providers"
 	"github.com/confidential-containers/cloud-api-adaptor/src/cloud-providers/util"
 	"github.com/confidential-containers/cloud-api-adaptor/src/cloud-providers/util/cloudinit"
@@ -52,14 +52,16 @@ func (p *ibmcloudPowerVSProvider) CreateInstance(ctx context.Context, podName, s
 		return nil, err
 	}
 
+	imageId := p.serviceConfig.ImageId
+
 	if spec.Image != "" {
 		logger.Printf("Choosing %s from annotation as the Power VS image for the PodVM image", spec.Image)
-		p.serviceConfig.ImageId = spec.Image
+		imageId = spec.Image
 	}
 
 	body := &models.PVMInstanceCreate{
 		ServerName:  &instanceName,
-		ImageID:     &p.serviceConfig.ImageId,
+		ImageID:     &imageId,
 		KeyPairName: p.serviceConfig.SSHKey,
 		Networks: []*models.PVMInstanceAddNetwork{
 			{
@@ -148,8 +150,8 @@ func (p *ibmcloudPowerVSProvider) Teardown() error {
 }
 
 func (p *ibmcloudPowerVSProvider) ConfigVerifier() error {
-	ImageId := p.serviceConfig.ImageId
-	if len(ImageId) == 0 {
+	imageId := p.serviceConfig.ImageId
+	if len(imageId) == 0 {
 		return fmt.Errorf("ImageId is empty")
 	}
 	return nil
